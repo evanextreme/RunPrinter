@@ -1,29 +1,42 @@
 import time
-
 from .threads import PrinterThread
 
 
 class Printer:
-    def __init__(self, sleeptime=2):
-        self.sleeptime = sleeptime
+    def __init__(self, delay=2):
         self.sleepthread = None
-        self.starttext = None
-        self.endtext = None
+        self.delay = delay
+        self.finished_message = None
+        self.last_continuous = False
+        self.kwargs = {}
 
-    def start(self, starttext="Running", endtext="done"):
-        self.starttext = starttext
-        self.endtext = endtext
-        self.sleepthread = PrinterThread(
-            printtime=self.sleeptime, starttext=starttext)
-        self.sleepthread.start()
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if self.last_continuous:
+            self.stop()
+
+    def print(self, *args, continuous=False,
+              finished_message="done", **kwargs):
+        self.kwargs = kwargs
+        self.last_continuous = continuous
+        if self.sleepthread:
+            self.stop()
+
+        if continuous:
+            self.finished_message = finished_message
+            self.kwargs['end'] = ''
+
+        print(*args, **self.kwargs)
+
+        if continuous:
+            self.sleepthread = PrinterThread(
+                printtime=self.delay)
+            self.sleepthread.start()
 
     def stop(self):
         self.sleepthread.stop()
         self.sleepthread.join()
+        self.sleepthread = None
+        self.kwargs = {}
         while self.sleepthread.isAlive():
             time.sleep(0.5)
-        print(self.endtext)
-
-    def restart(self, starttext="Running", endtext="done"):
-        self.stop()
-        self.start(starttext=starttext)
+        print(self.finished, **self.kwargs)
