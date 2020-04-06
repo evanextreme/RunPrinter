@@ -9,9 +9,9 @@ from setuptools import setup, find_packages
 
 setup(
     name='runprinter',
-    version='0.1',
-    packages=find_packages('src'),
-    package_dir={'': 'src'},
+    version='0.2',
+    packages=['runprinter'],
+    package_dir={'runprinter': './src'},
     license='Creative Commons Attribution-Noncommercial-Share Alike license',
     long_description=open('README.md').read(),
     python_requires='>=3.5',
