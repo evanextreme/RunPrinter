@@ -1,3 +1,7 @@
+import threading
+import time
+
+
 class PrinterThread(threading.Thread):
     def __init__(self, starttext, printtime=2, inctime=0.5):
         threading.Thread.__init__(self)
